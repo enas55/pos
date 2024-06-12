@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:pos/helpers/sql_helper.dart';
 import 'package:pos/pages/main_page.dart';
 import 'package:pos/utilities/app_text_field.dart';
 import 'package:pos/utilities/my_palette.dart';
@@ -18,11 +20,22 @@ class _HomePageState extends State<HomePage> {
 
   bool isVisible = true;
 
+  bool isLoading = true;
+  bool result = false;
+
   @override
   void initState() {
+    init();
+    isLoading = false;
     nameController = TextEditingController();
     passController = TextEditingController();
     super.initState();
+  }
+
+  void init() async {
+    result = await GetIt.I.get<SqlHelper>().createTables();
+    isLoading = false;
+    setState(() {});
   }
 
   @override
@@ -34,12 +47,31 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              'Welcome',
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w300),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: Text(
+                    'Welcome',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w300),
+                  ),
+                ),
+                isLoading
+                    ? Transform.scale(
+                        scale: 0.15,
+                        child: const CircularProgressIndicator(
+                          color: Colors.white,
+                        ),
+                      )
+                    : CircleAvatar(
+                        radius: 10,
+                        backgroundColor: result ? Colors.green : Colors.red,
+                      ),
+              ],
             ),
             const SizedBox(
               height: 20,
