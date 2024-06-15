@@ -22,10 +22,10 @@ class MainPage extends StatelessWidget {
         children: [
           Container(
             color: primary[800],
-            height: MediaQuery.of(context).size.height / 2,
+            height: MediaQuery.of(context).size.height / 3,
             width: double.infinity,
             child: Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -33,7 +33,7 @@ class MainPage extends StatelessWidget {
                     'Point of sale',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 25,
+                      fontSize: 20,
                       fontWeight: FontWeight.w400,
                     ),
                   ),
@@ -42,7 +42,7 @@ class MainPage extends StatelessWidget {
                   ),
                   getCard('Exchange rate', '1 EUR = 11,712 UZS'),
                   const SizedBox(
-                    height: 20,
+                    height: 10,
                   ),
                   getCard('Today\'s sales', '110,000.00 UZS'),
                 ],
@@ -151,7 +151,7 @@ class MainPage extends StatelessWidget {
       ),
       color: primary.shade400.withOpacity(0.8),
       child: Padding(
-        padding: const EdgeInsets.all(30),
+        padding: const EdgeInsets.all(20),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -159,7 +159,7 @@ class MainPage extends StatelessWidget {
               label,
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: FontWeight.w400,
               ),
             ),
@@ -167,7 +167,7 @@ class MainPage extends StatelessWidget {
               text,
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: FontWeight.w400,
               ),
             ),

@@ -6,7 +6,6 @@ class AppTextField extends StatelessWidget {
     required this.controller,
     required this.label,
     required this.validator,
-    this.style,
     this.enabledBorder,
     this.focusedBorder,
     this.border,
@@ -14,11 +13,11 @@ class AppTextField extends StatelessWidget {
     this.inputFormatters,
     this.suffixIcon,
     this.obscureText = false,
+    this.color,
     super.key,
   });
   final TextEditingController controller;
   final String label;
-  final TextStyle? style;
   final InputBorder? enabledBorder;
   final InputBorder? focusedBorder;
   final InputBorder? border;
@@ -27,6 +26,7 @@ class AppTextField extends StatelessWidget {
   final List<TextInputFormatter>? inputFormatters;
   final Widget? suffixIcon;
   final bool obscureText;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -38,13 +38,16 @@ class AppTextField extends StatelessWidget {
           suffixIcon: suffixIcon,
           label: Text(
             label,
-            style: const TextStyle(color: Colors.white),
+            style: TextStyle(color: color),
           ),
           enabledBorder: enabledBorder,
           focusedBorder: focusedBorder,
           border: border,
         ),
-        style: style,
+        style: TextStyle(
+          color: color,
+          fontSize: 16,
+        ),
         validator: validator,
         keyboardType: keyboardType,
         inputFormatters: inputFormatters,

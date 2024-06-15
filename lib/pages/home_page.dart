@@ -32,6 +32,13 @@ class _HomePageState extends State<HomePage> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    nameController.dispose();
+    passController.dispose();
+    super.dispose();
+  }
+
   void init() async {
     result = await GetIt.I.get<SqlHelper>().createTables();
     isLoading = false;
@@ -93,7 +100,7 @@ class _HomePageState extends State<HomePage> {
               border: getBorder(),
               enabledBorder: getBorder(),
               focusedBorder: getBorder(),
-              style: const TextStyle(fontSize: 16, color: Colors.white),
+              color: Colors.white,
             ),
             AppTextField(
               controller: passController,
@@ -110,7 +117,7 @@ class _HomePageState extends State<HomePage> {
               border: getBorder(),
               enabledBorder: getBorder(),
               focusedBorder: getBorder(),
-              style: const TextStyle(fontSize: 16, color: Colors.white),
+              color: Colors.white,
               keyboardType: TextInputType.visiblePassword,
               suffixIcon: IconButton(
                 onPressed: () {
@@ -123,42 +130,46 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    fixedSize: const Size(double.maxFinite, 60),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: const EdgeInsets.all(20),
                   ),
-                  padding: const EdgeInsets.all(20),
-                ),
-                onPressed: () {
-                  try {
-                    if (formKey.currentState!.validate()) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (ctx) {
-                            return const MainPage();
-                          },
-                        ),
-                      );
+                  onPressed: () {
+                    try {
+                      if (formKey.currentState!.validate()) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (ctx) {
+                              return const MainPage();
+                            },
+                          ),
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Logged in successfully'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      }
+                      setState(() {});
+                    } catch (e) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Logged in successfully'),
-                          backgroundColor: Colors.green,
+                        SnackBar(
+                          content: Text('Failed to log in : $e'),
+                          backgroundColor: Colors.red,
                         ),
                       );
                     }
-                    setState(() {});
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Failed to log in : $e'),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
-                },
-                child: const Text('Log In'))
+                  },
+                  child: const Text('Log In')),
+            )
           ],
         ),
       ),
@@ -168,7 +179,7 @@ class _HomePageState extends State<HomePage> {
   InputBorder? getBorder() {
     return OutlineInputBorder(
       borderSide: const BorderSide(color: Colors.white),
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(5),
     );
   }
 }
