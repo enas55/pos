@@ -32,13 +32,6 @@ class _HomePageState extends State<HomePage> {
     super.initState();
   }
 
-  @override
-  void dispose() {
-    nameController.dispose();
-    passController.dispose();
-    super.dispose();
-  }
-
   void init() async {
     result = await GetIt.I.get<SqlHelper>().createTables();
     isLoading = false;

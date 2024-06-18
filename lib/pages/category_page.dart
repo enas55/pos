@@ -15,6 +15,7 @@ class CategoryPage extends StatefulWidget {
 
 class _CategoryPageState extends State<CategoryPage> {
   List<CategoryData> categories = [];
+  bool isAscending = true;
 
   @override
   void initState() {
@@ -130,13 +131,17 @@ class _CategoryPageState extends State<CategoryPage> {
                 Expanded(
                   child: IconButton(
                     onPressed: () {
-                      sortCategory();
+                      sortCategories();
                     },
                     icon: const Icon(
-                      Icons.sort,
+                      Icons.sort_by_alpha_rounded,
                       color: primary,
                     ),
                   ),
+                ),
+                Text(
+                  isAscending ? 'From (Z-A)' : 'From (A-Z)',
+                  style: const TextStyle(color: primary, fontSize: 14),
                 ),
               ],
             ),
@@ -283,8 +288,13 @@ class _CategoryPageState extends State<CategoryPage> {
     );
   }
 
-  void sortCategory() {
-    categories.sort((a, b) => a.name!.compareTo(b.name!));
+  void sortCategories() {
+    categories.sort((a, b) {
+      return isAscending
+          ? a.name!.compareTo(b.name!)
+          : b.name!.compareTo(a.name!);
+    });
+    isAscending = !isAscending;
     setState(() {});
   }
 }
