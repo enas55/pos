@@ -40,6 +40,7 @@ class _CategoryPageState extends State<CategoryPage> {
       log('>>>>>>>>>>>>>>>>>$data');
     } catch (e) {
       categories = [];
+
       log('Error in get categories : $e');
     }
     setState(() {});
@@ -71,64 +72,142 @@ class _CategoryPageState extends State<CategoryPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
-        child: categories.isEmpty
-            ? const Center(child: Text('No Data'))
-            : ListView.builder(
-                itemCount: categories.length,
-                itemBuilder: (context, index) {
-                  var res = categories[index];
-                  return Card(
-                    color: primary.shade50,
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: ListTile(
-                            title: Text(
-                              res.name ?? 'No name',
-                              style: const TextStyle(
-                                  color: primary,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w400),
-                            ),
-                            subtitle: Text(
-                              res.description ?? 'No description',
-                              style: TextStyle(
-                                  color: primary.shade400,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w400),
-                            ),
-                          ),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  flex: 4,
+                  child: TextFormField(
+                    onChanged: (text) async {
+                      if (text == '') {
+                        await getCategory();
+                        return;
+                      }
+
+                      var sqlHelper = GetIt.I.get<SqlHelper>();
+                      var data = await sqlHelper.db!.rawQuery("""
+                      Select * from categories
+                      where name like '%$text%' or description like '%$text%'
+                      """);
+                      if (data.isNotEmpty) {
+                        categories = [];
+                        for (var item in data) {
+                          categories.add(
+                            CategoryData.fromJson(item),
+                          );
+                        }
+                      } else {
+                        categories = [];
+                      }
+                      setState(() {});
+                    },
+                    decoration: InputDecoration(
+                      label: const Text(
+                        'Search',
+                        style: TextStyle(
+                          color: primary,
                         ),
-                        Expanded(
+                      ),
+                      prefixIcon: const Icon(
+                        Icons.search,
+                        color: primary,
+                      ),
+                      border: getBorder(),
+                      enabledBorder: getBorder(),
+                      focusedBorder: getBorder().copyWith(
+                        borderSide: BorderSide(
+                          color: primary.shade400,
+                          width: 2,
+                        ),
+                      ),
+                    ),
+                    style: TextStyle(
+                      color: primary[400],
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: IconButton(
+                    onPressed: () {
+                      sortCategory();
+                    },
+                    icon: const Icon(
+                      Icons.sort,
+                      color: primary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            Expanded(
+              child: categories.isEmpty
+                  ? const Center(child: Text('No Data'))
+                  : ListView.builder(
+                      itemCount: categories.length,
+                      itemBuilder: (context, index) {
+                        var res = categories[index];
+                        return Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          color: primary.shade50,
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              IconButton(
-                                onPressed: () async {
-                                  await onUpdate(res);
-                                },
-                                icon: const Icon(
-                                  Icons.edit,
-                                  color: primary,
+                              Expanded(
+                                child: ListTile(
+                                  title: Text(
+                                    res.name ?? 'No name',
+                                    style: const TextStyle(
+                                        color: primary,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w400),
+                                  ),
+                                  subtitle: Text(
+                                    res.description ?? 'No description',
+                                    style: TextStyle(
+                                        color: primary.shade400,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w400),
+                                  ),
                                 ),
                               ),
-                              IconButton(
-                                onPressed: () async {
-                                  await onDeleteCategory(res);
-                                },
-                                icon: const Icon(
-                                  Icons.delete,
-                                  color: primary,
+                              Expanded(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    IconButton(
+                                      onPressed: () async {
+                                        await onUpdateCategory(res);
+                                      },
+                                      icon: const Icon(
+                                        Icons.edit,
+                                        color: primary,
+                                      ),
+                                    ),
+                                    IconButton(
+                                      onPressed: () async {
+                                        await onDeleteCategory(res);
+                                      },
+                                      icon: const Icon(
+                                        Icons.delete,
+                                        color: primary,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                      ],
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -181,7 +260,7 @@ class _CategoryPageState extends State<CategoryPage> {
     }
   }
 
-  Future<void> onUpdate(CategoryData category) async {
+  Future<void> onUpdateCategory(CategoryData category) async {
     var res = await Navigator.push(
       context,
       MaterialPageRoute(
@@ -195,5 +274,17 @@ class _CategoryPageState extends State<CategoryPage> {
     if (res ?? false) {
       getCategory();
     }
+  }
+
+  InputBorder getBorder() {
+    return OutlineInputBorder(
+      borderSide: const BorderSide(color: primary),
+      borderRadius: BorderRadius.circular(5),
+    );
+  }
+
+  void sortCategory() {
+    categories.sort((a, b) => a.name!.compareTo(b.name!));
+    setState(() {});
   }
 }
