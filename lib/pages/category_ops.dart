@@ -29,6 +29,13 @@ class _CategoryOpsState extends State<CategoryOps> {
   }
 
   @override
+  void dispose() {
+    nameController.dispose();
+    descriptionController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -121,7 +128,7 @@ class _CategoryOpsState extends State<CategoryOps> {
           SnackBar(
             content: Text(widget.category == null
                 ? 'Item added successfully'
-                : 'Iten updated successfully'),
+                : 'Item updated successfully'),
             backgroundColor: Colors.green,
           ),
         );

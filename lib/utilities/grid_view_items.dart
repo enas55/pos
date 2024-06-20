@@ -36,8 +36,8 @@ class GridViewItems extends StatelessWidget {
             Text(
               label,
               style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w400,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ],

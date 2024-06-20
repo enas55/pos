@@ -7,8 +7,16 @@ import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 class SqlHelper {
   Database? db;
 
+  Future<void> registerForeignKeys() async {
+    await db!.rawQuery('PRAGMA foreign_keys = on');
+    var result = await db!.rawQuery('PRAGMA foreign_keys');
+
+    print(result);
+  }
+
   Future<bool> createTables() async {
     try {
+      await registerForeignKeys();
       var batch = db!.batch();
       batch.execute("""
       Create table If not exists categories(
@@ -23,7 +31,7 @@ class SqlHelper {
       description text,
       price double,
       stock integer,
-      isAvaliable boolean,
+      isAvailable boolean,
       image text,
       categoryId integer,
       foreign key(categoryId) references categories(id)
@@ -82,7 +90,7 @@ class SqlHelper {
         );
       }
     } catch (e) {
-      log('error in create db : $e');
+      log('error in create db : ${e}');
     }
   }
 }

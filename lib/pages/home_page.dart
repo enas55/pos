@@ -57,7 +57,7 @@ class _HomePageState extends State<HomePage> {
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: 20,
-                        fontWeight: FontWeight.w300),
+                        fontWeight: FontWeight.w500),
                   ),
                 ),
                 isLoading
