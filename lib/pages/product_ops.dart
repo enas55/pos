@@ -69,7 +69,7 @@ class _ProductOpsState extends State<ProductOps> {
                 label: 'Name',
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'This field is required';
+                    return 'Name is required';
                   }
                   return null;
                 },
@@ -88,7 +88,7 @@ class _ProductOpsState extends State<ProductOps> {
                 label: 'Description',
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'This field is required';
+                    return 'Description is required';
                   }
                   return null;
                 },
@@ -129,7 +129,7 @@ class _ProductOpsState extends State<ProductOps> {
                       label: 'Price',
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'This field is required';
+                          return 'Price is required';
                         }
                         return null;
                       },
@@ -152,7 +152,7 @@ class _ProductOpsState extends State<ProductOps> {
                       label: 'Stock',
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'This field is required';
+                          return 'Stock is required';
                         }
                         return null;
                       },
@@ -185,8 +185,9 @@ class _ProductOpsState extends State<ProductOps> {
                   children: [
                     Text(
                       isAvailable ?? false ? 'Available' : 'Not available',
-                      style: const TextStyle(
-                          color: primary,
+                      style: TextStyle(
+                          color:
+                              isAvailable ?? false ? Colors.green : Colors.red,
                           fontWeight: FontWeight.w500,
                           fontSize: 18),
                     ),

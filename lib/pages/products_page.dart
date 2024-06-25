@@ -17,6 +17,7 @@ class ProductsPage extends StatefulWidget {
 class _ProductsPageState extends State<ProductsPage> {
   List<ProductData> products = [];
   bool isAscending = true;
+  String filteredProducts = '';
 
   @override
   void initState() {
@@ -28,10 +29,10 @@ class _ProductsPageState extends State<ProductsPage> {
     try {
       var sqlHelper = GetIt.I.get<SqlHelper>();
       var data = await sqlHelper.db!.rawQuery("""
-Select P.*, C.name as categoryName, C.description as categoryDescription from products P
-Inner JOIN categories C
-On P.categoryId = C.id
-""");
+      Select P.*, C.name as categoryName, C.description as categoryDescription from products P
+      Inner JOIN categories C
+      On P.categoryId = C.id
+      """);
       if (data.isNotEmpty) {
         products = [];
         for (var item in data) {
@@ -58,6 +59,10 @@ On P.categoryId = C.id
       appBar: AppBar(
         title: const Text('Products'),
         actions: [
+          IconButton(
+            onPressed: filterDialog,
+            icon: const Icon(Icons.filter_list),
+          ),
           IconButton(
             onPressed: () async {
               var res = await Navigator.push(
@@ -136,7 +141,7 @@ On P.categoryId = C.id
                 Expanded(
                   child: IconButton(
                     onPressed: () {
-                      sortCategories();
+                      sortProducts();
                     },
                     icon: const Icon(
                       Icons.sort_by_alpha_rounded,
@@ -183,23 +188,20 @@ On P.categoryId = C.id
                                       const SizedBox(height: 8),
                                       Text(
                                         res.description ?? 'No Description',
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            color: primary.shade400),
+                                        style: const TextStyle(
+                                            fontSize: 16, color: Colors.black),
                                       ),
                                       const SizedBox(height: 4),
                                       Text(
                                         'Price: ${res.price!.toString()}',
                                         style: const TextStyle(
-                                            fontSize: 16,
-                                            color: Colors.black87),
+                                            fontSize: 16, color: Colors.black),
                                       ),
                                       const SizedBox(height: 4),
                                       Text(
                                         'Stock: ${res.stock ?? 0}',
                                         style: const TextStyle(
-                                            fontSize: 16,
-                                            color: Colors.black87),
+                                            fontSize: 16, color: Colors.black),
                                       ),
                                       const SizedBox(height: 4),
                                       Text(
@@ -215,20 +217,32 @@ On P.categoryId = C.id
                                       Text(
                                         'Category : ${res.categoryName ?? 'No Category'}',
                                         style: const TextStyle(
-                                            fontSize: 16,
-                                            color: Colors.black87),
+                                            fontSize: 16, color: Colors.black),
                                       ),
                                     ],
                                   ),
-                                  leading: res.image != null
-                                      ? Image.network(
-                                          res.image!,
-                                          width: 50,
-                                          height: 50,
-                                          fit: BoxFit.cover,
-                                        )
-                                      : const Icon(Icons.image,
-                                          size: 50, color: primary),
+                                  leading:
+
+                                      // res.image != null
+                                      //     ? Image.network(
+                                      //         res.image!,
+                                      //         width: 50,
+                                      //         height: 50,
+                                      //         fit: BoxFit.cover,
+                                      //       )
+                                      //     : Container(
+                                      //         width: 50,
+                                      //         height: 50,
+                                      //         child: const Icon(Icons.image,
+                                      //             color: primary),
+                                      //       ),
+
+                                      Image.network(
+                                    res.image!,
+                                    width: 50,
+                                    height: 50,
+                                    fit: BoxFit.cover,
+                                  ),
                                   trailing: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
@@ -317,7 +331,7 @@ On P.categoryId = C.id
       if (confirmDelete ?? false) {
         var sqlHelper = GetIt.I.get<SqlHelper>();
         await sqlHelper.db!.delete(
-          'categories',
+          'products',
           where: 'id =?',
           whereArgs: [product.id],
         );
@@ -351,7 +365,7 @@ On P.categoryId = C.id
     }
   }
 
-  void sortCategories() {
+  void sortProducts() {
     products.sort((a, b) {
       return isAscending
           ? a.name!.compareTo(b.name!)
@@ -365,6 +379,75 @@ On P.categoryId = C.id
     return OutlineInputBorder(
       borderSide: const BorderSide(color: primary),
       borderRadius: BorderRadius.circular(5),
+    );
+  }
+
+  Future<void> filteredPro(String filter) async {
+    try {
+      var sqlHelper = GetIt.I.get<SqlHelper>();
+      var result = await sqlHelper.db!.rawQuery("""
+      SELECT * FROM products 
+      WHERE name LIKE '%$filter%''
+      """);
+      if (result.isNotEmpty) {
+        products = [];
+        for (var item in result) {
+          products.add(ProductData.fromJson(item));
+        }
+      } else {
+        products = [];
+      }
+      setState(() {});
+    } catch (e) {
+      products = [];
+      log('Error in filtering categories : $e');
+    }
+  }
+
+  void filterDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        String filterInput = filteredProducts;
+
+        return AlertDialog(
+          backgroundColor: primary.shade50,
+          title: const Text(
+            'Filter Products',
+            style: TextStyle(color: primary),
+          ),
+          content: TextField(
+            onChanged: (value) {
+              filterInput = value;
+            },
+            decoration: const InputDecoration(
+              hintText: 'Enter filter text',
+              enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(
+                  color: Colors.black,
+                ),
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Filter'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                filteredProducts = filterInput;
+                setState(() {});
+                filteredPro(filterInput);
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

@@ -140,7 +140,9 @@ class _HomePageState extends State<HomePage> {
                           context,
                           MaterialPageRoute(
                             builder: (ctx) {
-                              return const MainPage();
+                              return MainPage(
+                                userName: nameController.text,
+                              );
                             },
                           ),
                         );

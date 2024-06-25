@@ -50,7 +50,7 @@ class _CategoryOpsState extends State<CategoryOps> {
               label: 'Name',
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'This field is required';
+                  return 'Name is required';
                 }
                 return null;
               },
@@ -69,7 +69,7 @@ class _CategoryOpsState extends State<CategoryOps> {
               label: 'Description',
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'This field is required';
+                  return 'Description is required';
                 }
                 return null;
               },

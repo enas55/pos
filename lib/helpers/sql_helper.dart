@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
@@ -51,7 +50,7 @@ class SqlHelper {
       label text,
       totalPrice real,
       discount real,
-      clientId integer ,
+      clientId integer,
       foreign key(clientId) references clients(id)
       ON Delete restrict
       )""");
@@ -63,6 +62,13 @@ class SqlHelper {
       foreign key(productId) references products(id)
       ON Delete restrict
       )""");
+      batch.execute("""
+      Create table If not exists exchangeRate(
+      id integer,
+      currency text,
+      exchangeRate text
+      )
+      """);
 
       var result = await batch.commit();
 
@@ -90,7 +96,7 @@ class SqlHelper {
         );
       }
     } catch (e) {
-      log('error in create db : ${e}');
+      log('error in create db : $e');
     }
   }
 }

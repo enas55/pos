@@ -16,6 +16,7 @@ class CategoryPage extends StatefulWidget {
 class _CategoryPageState extends State<CategoryPage> {
   List<CategoryData> categories = [];
   bool isAscending = true;
+  String filterCategories = '';
 
   @override
   void initState() {
@@ -53,6 +54,10 @@ class _CategoryPageState extends State<CategoryPage> {
       appBar: AppBar(
         title: const Text('Categories'),
         actions: [
+          IconButton(
+            onPressed: filterDialog,
+            icon: const Icon(Icons.filter_list),
+          ),
           IconButton(
             onPressed: () async {
               var res = await Navigator.push(
@@ -296,5 +301,74 @@ class _CategoryPageState extends State<CategoryPage> {
     });
     isAscending = !isAscending;
     setState(() {});
+  }
+
+  Future<void> filteredCat(String filter) async {
+    try {
+      var sqlHelper = GetIt.I.get<SqlHelper>();
+      var result = await sqlHelper.db!.rawQuery("""
+      SELECT * FROM categories 
+      WHERE name LIKE '%$filter%' OR description LIKE '%$filter%'
+      """);
+      if (result.isNotEmpty) {
+        categories = [];
+        for (var item in result) {
+          categories.add(CategoryData.fromJson(item));
+        }
+      } else {
+        categories = [];
+      }
+      setState(() {});
+    } catch (e) {
+      categories = [];
+      log('Error in filtering categories : $e');
+    }
+  }
+
+  void filterDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        String filterInput = filterCategories;
+
+        return AlertDialog(
+          backgroundColor: primary.shade50,
+          title: const Text(
+            'Filter Categories',
+            style: TextStyle(color: primary),
+          ),
+          content: TextField(
+            onChanged: (value) {
+              filterInput = value;
+            },
+            decoration: const InputDecoration(
+              hintText: 'Enter filter text',
+              enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(
+                  color: Colors.black,
+                ),
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Filter'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                filterCategories = filterInput;
+                setState(() {});
+                filteredCat(filterInput);
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }
